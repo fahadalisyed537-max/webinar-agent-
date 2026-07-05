@@ -1,0 +1,26 @@
+{
+    "enabled": true,
+    "provider": "placeholder",
+    "// INSTRUCTIONS": "Replace the IDs below with your actual ad network IDs",
+    "google": {
+        "enabled": false,
+        "publisherId": "ca-pub-XXXXXXXXXXXXXXXX",
+        "bannerSlot": "1234567890",
+        "interstitialSlot": "0987654321"
+    },
+    "meta": {
+        "enabled": false,
+        "appId": "YOUR_META_APP_ID",
+        "placementId": "YOUR_PLACEMENT_ID"
+    },
+    "tiktok": {
+        "enabled": false,
+        "pixelId": "YOUR_TIKTOK_PIXEL_ID"
+    },
+    "slots": {
+        "homeBanner": true,
+        "afterMeditation": true,
+        "afterCheckin": false
+    },
+    "testMode": true
+}

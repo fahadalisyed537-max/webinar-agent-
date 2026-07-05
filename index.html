@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>MindBloom - Mental Wellness</title>
+    <!-- PWA Meta Tags -->
+    <meta name="description"
+        content="Your daily mental wellness companion. Track mood, meditate, breathe & sleep better.">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MindBloom">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="app" class="app-container">
+        <div class="hud-frame">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <span class="time" id="current-time">--:--</span>
+                <div class="indicators">
+                    <span class="indicator heart-rate" id="heart-rate">♥ --</span>
+                    <span class="indicator battery">🔋</span>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <main class="main-content" id="main-content">
+                <!-- Onboarding Screen -->
+                <div class="screen" id="screen-onboarding">
+                    <div class="onboarding-content">
+                        <div class="onboarding-hero">
+                            <div class="onboarding-icon">💙</div>
+                            <h1 class="onboarding-title">Welcome</h1>
+                            <p class="onboarding-message">I'm here to support your emotional well-being.</p>
+                        </div>
+                        <div class="onboarding-features">
+                            <div class="feature-item"><span class="feature-icon">💭</span><span>Daily mood
+                                    check-ins</span></div>
+                            <div class="feature-item"><span class="feature-icon">🧘</span><span>Guided
+                                    meditations</span></div>
+                            <div class="feature-item"><span class="feature-icon">🔒</span><span>Private & secure</span>
+                            </div>
+                        </div>
+                        <div class="language-picker">
+                            <p>Choose your language:</p>
+                            <div class="language-options">
+                                <button class="lang-btn selected"
+                                    onclick="app.selectOnboardingLang('en', this)">English</button>
+                                <button class="lang-btn" onclick="app.selectOnboardingLang('es', this)">Español</button>
+                                <button class="lang-btn" onclick="app.selectOnboardingLang('zh', this)">中文</button>
+                            </div>
+                        </div>
+                        <button class="submit-btn" onclick="app.completeOnboarding()">Get Started</button>
+                    </div>
+                </div>
+
+                <!-- Home Screen -->
+                <div class="screen" id="screen-home">
+                    <div class="greeting" id="greeting">Good morning</div>
+                    <div class="mood-summary" id="mood-summary">
+                        <span class="last-mood">Last check-in: --</span>
+                    </div>
+                    <div class="quick-actions grid-3">
+                        <button class="action-btn primary" onclick="app.showScreen('checkin')">
+                            <span class="icon">💭</span><span class="label">Check In</span>
+                        </button>
+                        <button class="action-btn" onclick="app.showScreen('breathe')">
+                            <span class="icon">🌬️</span><span class="label">Breathe</span>
+                        </button>
+                        <button class="action-btn" onclick="app.showScreen('meditate')">
+                            <span class="icon">🧘</span><span class="label">Meditate</span>
+                        </button>
+                        <button class="action-btn" onclick="app.showScreen('sleep')">
+                            <span class="icon">🌙</span><span class="label">Sleep</span>
+                        </button>
+                        <button class="action-btn" onclick="app.showScreen('coping')">
+                            <span class="icon">🛡️</span><span class="label">Coping Plan</span>
+                        </button>
+                        <button class="action-btn" onclick="app.showScreen('journal')">
+                            <span class="icon">📝</span><span class="label">Journal</span>
+                        </button>
+                    </div>
+                    <div class="home-footer">
+                        <button class="text-btn-small" onclick="app.showScreen('settings')">⚙️ Settings</button>
+                    </div>
+                    <!-- Ad Banner Slot -->
+                    <div class="ad-slot" id="ad-home-banner"></div>
+                </div>
+
+                <!-- Check-In Screen -->
+                <div class="screen" id="screen-checkin">
+                    <div class="screen-header">
+                        <button class="back-btn" onclick="app.showScreen('home')">←</button>
+                        <h2>Check In</h2>
+                    </div>
+                    <div class="checkin-content">
+                        <p class="prompt">How are you feeling right now?</p>
+                        <div class="mood-selector">
+                            <button class="mood-btn" data-mood="1" onclick="app.selectMood(1)">😟</button>
+                            <button class="mood-btn" data-mood="3" onclick="app.selectMood(3)">😔</button>
+                            <button class="mood-btn" data-mood="5" onclick="app.selectMood(5)">😐</button>
+                            <button class="mood-btn" data-mood="7" onclick="app.selectMood(7)">🙂</button>
+                            <button class="mood-btn" data-mood="10" onclick="app.selectMood(10)">😊</button>
+                        </div>
+                        <div class="mood-slider-container">
+                            <input type="range" id="mood-slider" min="1" max="10" value="5"
+                                oninput="app.updateMoodSlider(this.value)">
+                            <div class="slider-labels"><span>1</span><span>5</span><span>10</span></div>
+                        </div>
+                        <div class="stressor-section hidden" id="stressor-section">
+                            <p class="prompt">What's on your mind?</p>
+                            <div class="stressor-tags">
+                                <button class="tag" data-stressor="work"
+                                    onclick="app.toggleStressor('work')">Work</button>
+                                <button class="tag" data-stressor="sleep"
+                                    onclick="app.toggleStressor('sleep')">Sleep</button>
+                                <button class="tag" data-stressor="relationship"
+                                    onclick="app.toggleStressor('relationship')">Relationship</button>
+                                <button class="tag" data-stressor="health"
+                                    onclick="app.toggleStressor('health')">Health</button>
+                                <button class="tag" data-stressor="finances"
+                                    onclick="app.toggleStressor('finances')">Finances</button>
+                                <button class="tag" data-stressor="other"
+                                    onclick="app.toggleStressor('other')">Other</button>
+                            </div>
+                        </div>
+                        <button class="submit-btn" onclick="app.submitCheckin()">Continue</button>
+                    </div>
+                </div>
+
+                <!-- Breathing Exercise Screen -->
+                <div class="screen" id="screen-breathe">
+                    <div class="screen-header">
+                        <button class="back-btn" onclick="app.showScreen('home')">←</button>
+                        <h2>Breathe</h2>
+                    </div>
+                    <div class="breathe-content">
+                        <div class="breathe-circle" id="breathe-circle">
+                            <div class="breathe-inner">
+                                <span class="breathe-text" id="breathe-text">Ready</span>
+                                <span class="breathe-timer" id="breathe-timer"></span>
+                            </div>
+                        </div>
+                        <p class="breathe-instruction" id="breathe-instruction">Tap to start box breathing</p>
+                        <button class="action-btn primary large" id="breathe-btn"
+                            onclick="app.toggleBreathing()">Start</button>
+                    </div>
+                </div>
+
+                <!-- Meditation Screen -->
+                <div class="screen" id="screen-meditate">
+                    <div class="screen-header">
+                        <button class="back-btn" onclick="app.showScreen('home')">←</button>
+                        <h2>Meditate</h2>
+                    </div>
+                    <div class="meditate-content">
+                        <p class="prompt">Choose a meditation</p>
+                        <div class="meditation-list">
+                            <button class="meditation-card" onclick="app.startMeditation('calm', 3)">
+                                <span class="med-icon">🌊</span>
+                                <div class="med-info"><span class="med-title">Calm Mind</span><span
+                                        class="med-duration">3 min</span></div>
+                            </button>
+                            <button class="meditation-card" onclick="app.startMeditation('focus', 5)">
+                                <span class="med-icon">🎯</span>
+                                <div class="med-info"><span class="med-title">Focus & Clarity</span><span
+                                        class="med-duration">5 min</span></div>
+                            </button>
+                            <button class="meditation-card" onclick="app.startMeditation('gratitude', 5)">
+                                <span class="med-icon">🙏</span>
+                                <div class="med-info"><span class="med-title">Gratitude</span><span
+                                        class="med-duration">5 min</span></div>
+                            </button>
+                            <button class="meditation-card" onclick="app.startMeditation('sleepprep', 10)">
+                                <span class="med-icon">🌙</span>
+                                <div class="med-info"><span class="med-title">Sleep Preparation</span><span
+                                        class="med-duration">10 min</span></div>
+                            </button>
+                            <button class="meditation-card" onclick="app.startMeditation('anxiety', 7)">
+                                <span class="med-icon">🦋</span>
+                                <div class="med-info"><span class="med-title">Ease Anxiety</span><span
+                                        class="med-duration">7 min</span></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Meditation Player Screen -->
+                <div class="screen" id="screen-meditation-player">
+                    <div class="meditation-player">
+                        <div class="player-visual">
+                            <div class="player-circle" id="player-circle">
+                                <span class="player-icon" id="player-icon">🌊</span>
+                            </div>
+                        </div>
+                        <h2 class="player-title" id="player-title">Calm Mind</h2>
+                        <p class="player-guidance" id="player-guidance">Find a comfortable position...</p>
+                        <div class="player-timer" id="player-timer">3:00</div>
+                        <div class="player-controls">
+                            <button class="action-btn" onclick="app.stopMeditation()">End Session</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sleep Coaching Screen -->
+                <div class="screen" id="screen-sleep">
+                    <div class="screen-header">
+                        <button class="back-btn" onclick="app.showScreen('home')">←</button>
+                        <h2>Sleep</h2>
+                    </div>
+                    <div class="sleep-content">
+                        <div class="sleep-stats">
+                            <div class="stat-card"><span class="stat-value" id="avg-sleep">--</span><span
+                                    class="stat-label">Avg Hours</span></div>
+                            <div class="stat-card"><span class="stat-value" id="avg-quality">--</span><span
+                                    class="stat-label">Quality</span></div>
+                        </div>
+                        <div class="sleep-log">
+                            <h3>Log Tonight's Sleep</h3>
+                            <div class="sleep-input">
+                                <label>Hours slept</label>
+                                <div class="hour-selector">
+                                    <button class="hour-btn" onclick="app.adjustSleepHours(-0.5)">−</button>
+                                    <span class="hour-display" id="sleep-hours">7.0</span>
+                                    <button class="hour-btn" onclick="app.adjustSleepHours(0.5)">+</button>
+                                </div>
+                            </div>
+                            <div class="sleep-input">
+                                <label>Sleep Quality</label>
+                                <div class="quality-selector">
+                                    <button class="quality-btn" data-quality="1"
+                                        onclick="app.setSleepQuality(1)">😫</button>
+                                    <button class="quality-btn" data-quality="2"
+                                        onclick="app.setSleepQuality(2)">😴</button>
+                                    <button class="quality-btn" data-quality="3"
+                                        onclick="app.setSleepQuality(3)">😌</button>
+                                    <button class="quality-btn" data-quality="4"
+                                        onclick="app.setSleepQuality(4)">😊</button>
+                                    <button class="quality-btn" data-quality="5"
+                                        onclick="app.setSleepQuality(5)">🌟</button>
+                                </div>
+                            </div>
+                            <button class="submit-btn" onclick="app.logSleep()">Save Sleep Log</button>
+                        </div>
+                        <div class="sleep-tips">
+                            <h3>💡 Tonight's Tip</h3>
+                            <p id="sleep-tip">Avoid screens 30 minutes before bed.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coping Plan Screen -->
+                <div class="screen" id="screen-coping">
+                    <div class="screen-header">
+                        <button class="back-btn" onclick="app.showScreen('home')">←</button>
+                        <h2>Coping Plan</h2>
+                    </div>
+                    <div class="coping-content">
+                        <p class="coping-intro">Your personal toolkit for tough moments</p>
+                        <div class="coping-section">
+                            <h3>⚠️ Warning Signs</h3>
+                            <div class="coping-items" id="warning-signs">
+                                <button class="coping-tag selected">Racing thoughts</button>
+                                <button class="coping-tag">Physical tension</button>
+                                <button class="coping-tag">Irritability</button>
+                                <button class="coping-tag">Withdrawing</button>
+                                <button class="coping-tag">Sleep problems</button>
+                            </div>
+                        </div>
+                        <div class="coping-section">
+                            <h3>🛠️ Coping Strategies</h3>
+                            <div class="coping-items" id="coping-strategies">
+                                <button class="coping-tag selected">Deep breathing</button>
+                                <button class="coping-tag selected">Take a walk</button>
+                                <button class="coping-tag">Listen to music</button>
+                                <button class="coping-tag">Call a friend</button>
+                                <button class="coping-tag">Write it out</button>
+                            </div>
+                        </div>
+                        <div class="coping-section">
+                            <h3>📞 Support Contact</h3>
+                            <div class="support-contact">
+                                <input type="text" placeholder="Name" class="support-input" id="contact-name">
+                                <input type="tel" placeholder="Phone number" class="support-input" id="contact-phone">
+                            </div>
+                        </div>
+                        <button class="submit-btn" onclick="app.saveCopingPlan()">Save Coping Plan</button>
+                    </div>
+                </div>
+
+                <!-- Journal Screen -->
+                <div class="screen" id="screen-journal">
+                    <div class="screen-header">
+                        <button class="back-btn" onclick="app.showScreen('home')">←</button>
+                        <h2>Journal</h2>
+                    </div>
+                    <div class="journal-content">
+                        <p class="prompt">What's on your mind?</p>
+                        <textarea id="journal-input" placeholder="Type or speak freely..."></textarea>
+                        <div class="emotion-tags">
+                            <button class="tag" onclick="app.toggleEmotion('anxious')">Anxious</button>
+                            <button class="tag" onclick="app.toggleEmotion('sad')">Sad</button>
+                            <button class="tag" onclick="app.toggleEmotion('frustrated')">Frustrated</button>
+                            <button class="tag" onclick="app.toggleEmotion('calm')">Calm</button>
+                            <button class="tag" onclick="app.toggleEmotion('hopeful')">Hopeful</button>
+                        </div>
+                        <button class="submit-btn" onclick="app.saveJournal()">Save Entry</button>
+                    </div>
+                </div>
+
+                <!-- Settings Screen -->
+                <div class="screen" id="screen-settings">
+                    <div class="screen-header">
+                        <button class="back-btn" onclick="app.showScreen('home')">←</button>
+                        <h2>Settings</h2>
+                    </div>
+                    <div class="settings-content">
+                        <div class="setting-group">
+                            <h3>Language</h3>
+                            <div class="language-options compact">
+                                <button class="lang-btn selected" id="lang-en"
+                                    onclick="app.changeLanguage('en')">EN</button>
+                                <button class="lang-btn" id="lang-es" onclick="app.changeLanguage('es')">ES</button>
+                                <button class="lang-btn" id="lang-zh" onclick="app.changeLanguage('zh')">中文</button>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <h3>Privacy</h3>
+                            <div class="setting-item">
+                                <span>Heart Rate Monitoring</span>
+                                <label class="toggle">
+                                    <input type="checkbox" id="setting-biometric" checked
+                                        onchange="app.toggleSetting('biometric')">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <span>Voice Features</span>
+                                <label class="toggle">
+                                    <input type="checkbox" id="setting-voice" checked
+                                        onchange="app.toggleSetting('voice')">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <h3>Data</h3>
+                            <button class="text-btn danger" onclick="app.confirmDeleteData()">Delete All Data</button>
+                        </div>
+                        <div class="setting-group">
+                            <h3>Emergency</h3>
+                            <button class="text-btn" onclick="app.showScreen('crisis')">Crisis Resources</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Crisis Resources Screen -->
+                <div class="screen" id="screen-crisis">
+                    <div class="screen-header">
+                        <button class="back-btn" onclick="app.showScreen('settings')">←</button>
+                        <h2>Crisis Resources</h2>
+                    </div>
+                    <div class="crisis-content">
+                        <div class="crisis-card">
+                            <h3>🆘 Suicide & Crisis Lifeline</h3>
+                            <p>Call or text <strong>988</strong></p>
+                            <p>Available 24/7</p>
+                            <button class="action-btn primary" onclick="window.open('tel:988')">Call Now</button>
+                        </div>
+                        <div class="crisis-card">
+                            <h3>💬 Crisis Text Line</h3>
+                            <p>Text <strong>HOME</strong> to <strong>741741</strong></p>
+                            <button class="action-btn" onclick="window.open('sms:741741')">Text Now</button>
+                        </div>
+                        <p class="crisis-note">You're not alone. These services are free, confidential, and available
+                            24/7.</p>
+                    </div>
+                </div>
+
+                <!-- Escalation Screen -->
+                <div class="screen escalation-screen" id="screen-escalation">
+                    <div class="escalation-content">
+                        <div class="escalation-icon">💙</div>
+                        <p class="escalation-message" id="escalation-message">
+                            I hear that you're in a lot of pain right now. I'm so glad you're here.
+                        </p>
+                        <div class="breathing-guide">
+                            <div class="breathe-circle small">
+                                <div class="breathe-inner">
+                                    <span class="breathe-text">Breathe</span>
+                                </div>
+                            </div>
+                            <p>Let's take a slow breath together...</p>
+                        </div>
+                        <div class="escalation-actions">
+                            <button class="action-btn primary" onclick="app.showCrisisResources()">Talk to
+                                Someone</button>
+                            <button class="action-btn" onclick="app.continueEscalation()">I'm Here With You</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Response Screen -->
+                <div class="screen" id="screen-response">
+                    <div class="response-content">
+                        <div class="response-icon" id="response-icon">✨</div>
+                        <p class="response-message" id="response-message">Thanks for checking in.</p>
+                        <div class="response-actions" id="response-actions">
+                            <button class="action-btn primary" onclick="app.showScreen('home')">Done</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Navigation Bar -->
+            <nav class="nav-bar" id="nav-bar">
+                <button class="nav-btn active" onclick="app.showScreen('home')" data-screen="home">
+                    <span class="nav-icon">🏠</span>
+                </button>
+                <button class="nav-btn" onclick="app.showScreen('checkin')" data-screen="checkin">
+                    <span class="nav-icon">💭</span>
+                </button>
+                <button class="nav-btn" onclick="app.showScreen('meditate')" data-screen="meditate">
+                    <span class="nav-icon">🧘</span>
+                </button>
+                <button class="nav-btn" onclick="app.showScreen('settings')" data-screen="settings">
+                    <span class="nav-icon">⚙️</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/safety.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/voice.js"></script>
+    <script src="js/ads.js"></script>
+    <script src="js/classes.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('[SW] Registered:', reg.scope))
+                    .catch(err => console.log('[SW] Registration failed:', err));
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,7 @@
+# Real Lead Scraper
+
+node_modules/
+dist/
+scraped_leads/
+.env.local
+*.js.map
